@@ -1,27 +1,49 @@
 import React, { useState } from 'react';
-import { ContactsCollection } from '../api/ContactsCollection';
+import { Meteor } from 'meteor/meteor';
+import ErrorAlert from './components/ErrorAlert';
+import { SuccessAlert } from './components/SuccessAlert';
 
 const ContactForm = () => {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [imageUrl, setImageUrl] = useState('');
+	const [error, setError] = useState('');
+	const [success, setSuccess] = useState('');
+
+	// * show error alert
+	const showError = ({ message }) => {
+		setError(message);
+		setTimeout(() => {
+			setError('');
+		}, 3000);
+	};
+
+	// * show success alert
+	const showSuccess = ({ message }) => {
+		setSuccess(message);
+		setTimeout(() => {
+			setSuccess('');
+		}, 3000);
+	};
 
 	const saveContact = () => {
-		console.log({ name, email, imageUrl });
-		ContactsCollection.insert({
-			name,
-			email,
-			imageUrl,
-			createdAt: new Date(),
-		});
+		Meteor.call('contacts.insert', { name, email, imageUrl }, (errorResponse) => {
+			if (errorResponse) {
+				showError({ message: errorResponse.error });
+			} else {
+				setName('');
+				setEmail('');
+				setImageUrl('');
 
-		setName('');
-		setEmail('');
-		setImageUrl('');
+				showSuccess({ message: 'Contact saved.' });
+			}
+		});
 	};
 
 	return (
 		<form className='mt-6'>
+			{error && <ErrorAlert message={error} />}
+			{success && <SuccessAlert message={success} />}
 			<div className='grid grid-cols-6 gap-6'>
 				<div className='col-span-6 sm:col-span-6 lg:col-span-2'>
 					<label
