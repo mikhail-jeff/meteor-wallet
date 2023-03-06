@@ -3,8 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { Meteor } from 'meteor/meteor';
 import { App } from '/imports/ui/App';
 
+// * for optimistic UI
+import '../imports/api/ContactsMethods';
+
 Meteor.startup(() => {
-  const container = document.getElementById('react-target');
-  const root = createRoot(container);
-  root.render(<App />);
+	const container = document.getElementById('react-target');
+	const root = createRoot(container);
+	root.render(<App />);
 });
